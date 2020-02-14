@@ -1,0 +1,174 @@
+#Ejercicio 2
+
+
+import requests, zipfile 
+from urllib.request import urlopen
+from io import BytesIO
+import pandas as pd
+import numpy as np
+zip_file_url = 'https://github.com/vanejaime/Curso_Python_CD/raw/master/datasets/FIFA19.csv.zip'
+remote_zip_file = urlopen(zip_file_url)
+zipinmemory = BytesIO(remote_zip_file.read())
+zip_file = zipfile.ZipFile(zipinmemory)
+
+data1 = pd.read_csv(zip_file.open(zip_file.namelist()[0]),encoding='850') #si tienen problemas intentar encoding='utf-8' o quitar la opcion encoding
+data2 = pd.read_csv(zip_file.open(zip_file.namelist()[1]),encoding='850')
+dict_position = pd.read_csv(zip_file.open(zip_file.namelist()[2]),encoding='850')
+
+
+data1.head()
+       data2.head()
+#Parte A
+ #1 Unir data 1 y data2
+ data3=pd.merge(data1,data2, left_on="ID", right_on="ID")
+
+#3
+ data3.set_index("ID",inplace = True)
+        
+#4
+data4=pd.merge(data3, dict_position, left_on="Position", right_on="Position")
+
+#5
+print((data4["Release Clause(Eur)"].isnull().sum()))
+data4["Release Clause(Eur)"] = data4["Release Clause(Eur)"].replace(0, np.NaN)
+data4["Release Clause(Eur)"].fillna(data4["Release Clause(Eur)"].min(), inplace=True)
+
+#6
+print((data4["Value(Eur)"].isnull().sum()))
+data4["Value(Eur)"] = data4["Value(Eur)"].replace(0, np.NaN)
+data4["Value(Eur)"].fillna(data4["Value(Eur)"].min(), inplace=True)
+
+#7
+print((data4["Wage(Eur)"].isnull().sum()))
+data4["Wage(Eur)"] = data4["Wage(Eur)"].replace(0, np.NaN)
+data4["Wage(Eur)"].fillna(data4["Wage(Eur)"].min(), inplace=True)
+#8
+data4["Height"]=2.54*data4["Height(in)"]
+
+#9
+data4["Weight"]=data4["Weight(lbs)"]*0.453592
+
+#Parte B
+data4["Cantidad"]=1
+
+
+print(base["Edad"][base["Promedio"]>=3])
+#1
+print(data4["Name"][data4["Weight"]==data4["Weight"].max()])
+print(data4["Name"][data4["Weight"]==data4["Weight"].min()])
+#2
+print(data4["Name"][data4["Height"]==data4["Height"].max()])
+print(data4["Name"][data4["Height"]==data4["Height"].min()])
+#3
+print(data4["Name"][data4["Age"]==data4["Age"].max()])
+print(data4["Name"][data4["Age"]==data4["Age"].min()])
+#4
+
+  temp=pd.pivot_table(data4, index='Name', aggfunc=np.sum, values=["Overall"])  
+       temp.sort_values(by=['Overall'], inplace=True, ascending=False)
+      temp.iloc[0:11]
+  #5
+ pd.pivot_table(data4, index='Nationality', aggfunc=len, values=["Cantidad"])
+
+  #6
+ pd.pivot_table(data4, index='Age', aggfunc=len, values=["Cantidad"])
+
+  #7
+ pd.pivot_table(data4, index='Significado', aggfunc=len, values=["Cantidad"])
+
+  #8
+  pd.pivot_table(data4, index='Nationality', aggfunc=np.mean, values=["Height","Weight"])
+
+  #9
+  pd.pivot_table(data4, index='Club', aggfunc=np.mean, values=["Height","Weight"])
+  
+  #10
+
+  temp1=pd.pivot_table(data4, index='Club', aggfunc=np.sum, values=["Wage(Eur)"])
+  temp1.sort_values(by=['Wage(Eur)'], inplace=True, ascending=False)
+  temp1.iloc[0]
+
+  #11
+  temp.sort_values(by=['Wage(Eur)'], inplace=True)
+  temp.iloc[0]
+  
+  
+  #12
+      pd.pivot_table(data4, index='Preferred Foot', aggfunc=len, values=["Cantidad"])
+
+#13
+      pd.pivot_table(data4, index='Nationality', aggfunc=len, values=["Cantidad"], columns=["Significado"])
+
+#14
+      temp=pd.pivot_table(data4, index='Jersey Number', aggfunc=len, values=["Cantidad"])
+      temp.sort_values(by=['Cantidad'], inplace=True, ascending=False)
+      temp.iloc[0]
+      temp.sort_values(by=['Cantidad'], inplace=True)
+      temp.iloc[0]
+  
+#15
+   temp=pd.pivot_table(data4, index='Loaned From', aggfunc=len, values=["Cantidad"])
+   temp.sort_values(by=['Cantidad'], inplace=True, ascending=False)
+      temp.iloc[0]
+
+#16
+      temp.sort_values(by=['Cantidad'], inplace=True)
+      temp.iloc[0]
+
+   #17
+   temp =pd.pivot_table(data4, index='Club', aggfunc=len, values=["Loaned From"])
+      temp.sort_values(by=['Loaned From'], inplace=True, ascending=False)
+      temp.iloc[0]
+
+    #18  
+        pd.pivot_table(data4, index='Significado', aggfunc=np.mean, values=["Wage(Eur)"])
+        
+#19        
+  temp= pd.pivot_table(data4, index='Club', aggfunc=np.sum, values=["Value(Eur)"])
+     temp.sort_values(by=['Value(Eur)'], inplace=True, ascending=False)
+      temp.iloc[0]
+
+#20
+      temp.sort_values(by=['Value(Eur)'], inplace=True)
+      temp.iloc[0]
+
+   #21   
+temp=pd.pivot_table(data4, index='Name', aggfunc=np.sum, values=["Release Clause(Eur)"])
+     temp.sort_values(by=['Release Clause(Eur)'], inplace=True, ascending=False)
+      temp.iloc[0:8]
+      nombs=list(temp.iloc[0:8].index)
+data5=data4[["Name","Club"]][data4["Name"].isin(nombs)]
+
+#22
+   temp=pd.pivot_table(data4, index='Nationality', aggfunc=[np.mean], values=["Overall","Potential"])
+     temp.sort_values(by=[('mean','Overall')], inplace=True, ascending=False)
+      temp.iloc[0]
+
+#23
+     temp.sort_values(by=[('mean','Overall')], inplace=True)
+      temp.iloc[0]
+
+#24
+      temp=  temp= pd.pivot_table(data4, index='Nationality', aggfunc=np.sum, values=["Value(Eur)"])
+     temp.sort_values(by=['Value(Eur)'], inplace=True, ascending=False)
+      temp
+#25
+      temp=  temp= pd.pivot_table(data4, index='Age', aggfunc=np.sum, values=["Value(Eur)"])
+     temp.sort_values(by=['Value(Eur)'], inplace=True, ascending=False)
+      temp   
+      
+#26
+   pd.pivot_table(data4, index='Age', aggfunc=[np.mean], values=["Value(Eur)"])
+  
+        import matplotlib.pyplot as plt
+        plt.style.use('ggplot')
+data4["Contract Valid Until"].hist()
+plt.show()
+   #27     
+             pd.pivot_table(data4, index='Significado', aggfunc=np.mean, values=["Age"])
+
+#28
+             pd.pivot_table(data4, index='Significado', aggfunc=np.mean, values=["Weight"])
+
+#29
+             pd.pivot_table(data4, index='Significado', aggfunc=np.mean, values=["Height"])
